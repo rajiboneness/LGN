@@ -46,6 +46,14 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+        'gamer' => [
+            'driver' => 'session',
+            'provider' => 'gamers',
+        ],
+        'team' => [
+            'driver' => 'session',
+            'provider' => 'teams',
+        ],
     ],
 
     /*
@@ -75,6 +83,14 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+        'teams' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Teams::class,
+        ],
+        'gamers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Gamer::class,
+        ],
     ],
 
     /*

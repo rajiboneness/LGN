@@ -1,0 +1,464 @@
+@extends("admin.layouts.master")
+
+
+@section("content")
+
+<div class="content">
+
+   <div class="card">
+    <form action="">
+      <div class="card-header header-elements-inline">         
+            <div class="col-md-12">
+               <div class="col-md-6">
+                  <input type="text" class="form-control" name="gamer_name" placeholder="Search Here">
+               </div>
+               <div class="col-md-3">
+                  <button type="submit" class="btn bg-teal-400"> Search</button>
+               </div>
+            </div>        
+      </div>
+      </form>
+
+      <div class="card-header header-elements-inline">
+
+         <h5 class="card-title">Gamers Tournaments  List </h5>
+
+         <div class="header-elements">
+
+            @can('Tournaments-Create')
+
+            <div class="list-icons">
+
+               <a href="{{route('gamerstournaments.create')}}" class="btn bg-teal-400 text-uppercase"><i class="fas fa-plus mr-1"></i>Add Gamers Tournaments</a>
+
+               <a href="javascript:void(0);" data-toggle="modal" data-target="#myModal" class="btn bg-teal-400 text-uppercase"><i class="fas fa-plus mr-1"></i>Set Room Password</a>
+
+               <a href="javascript:void(0);" data-toggle="modal" data-target="#myModal1" class="btn bg-teal-400 text-uppercase"><i class="fas fa-plus mr-1"></i>Send Email</a>
+
+            </div>
+
+            @endcan
+
+         </div>
+
+      </div>
+
+      <div class="table-responsive">
+
+         <table id="example1" class="table table-striped datatable-responsive">
+
+            <thead>
+
+               <tr class="bg-teal-400">
+
+                  <th width="3%">SL No</th>
+
+                  <th>Tournament</th>
+
+                  <th>Room Code</th>
+
+                  <th>Gamer Name</th>
+                  <th>Gamer Email</th>
+                  <th>Ingame Name</th>
+
+                  <th>Ingame Id</th>
+
+                  @can('Tournaments-Edit')
+
+                  <th>Status</th>
+
+                  @endcan
+
+                  <th>Action</th>
+
+               </tr>
+
+            </thead>
+
+            <tbody>
+
+               <?php $slno = 1; ?>
+
+               @if($gamerstournaments)
+
+               @foreach($gamerstournaments as $data)
+
+               <tr>
+
+                  <td>{{$slno}}</td>
+
+                  <td> {{$data->tournaments}}</td>
+
+                  <td>{{$data->room_code}}</td>
+
+                  <td>{{$data->fname}} {{$data->lname}}</td>
+                  <td>{{$data->email}}</td>
+                  <td>{{$data->in_game_name}}</td>
+
+                  <td>{{$data->in_game_id}}</td>
+
+                  @can('Tournaments-Edit')
+
+                  <td> 
+
+                     @if($data->is_active == 0)
+
+                     <a class="badge bg-danger" href="{{ URL::to('gamerstournaments/change-status/'.$data->gtid) }}">Inactive</a>
+
+                     @else
+
+                     <a class="badge bg-success" href="{{ URL::to('gamerstournaments/change-status/'.$data->gtid) }}">Active</a>
+
+                  </td>
+
+                  @endif @endcan
+
+                  <td>
+
+                     <div class="list-icons">
+
+                        @can('Tournaments-Read')
+
+                        <a class="badge bg-success" href="{{route('gamerstournaments.show',$data->gtid)}}">Show</a>
+
+                        @endcan @can('Tournaments-Edit')
+
+                        <a class="badge bg-primary"href="{{ route('gamerstournaments.edit',$data->gtid) }}">Edit</a>   
+
+                        @endcan
+
+                        @can('Tournaments-Delete')                                            
+
+                        <a href="#" data-toggle="modal" data-target="#confirm-delete{{$data->gtid}}" class="badge bg-danger">Delete</a>
+
+                     </div>
+
+                     <div class="modal fade" id="confirm-delete{{$data->gtid}}" role="dialog" style="text-align: left;">
+
+                        <div class="modal-dialog" style="width: 35%;">
+
+                           <!-- Modal content-->
+
+                           <div class="modal-content">
+
+                              <div class="modal-header">
+
+                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+                                 <h4 class="modal-title">Confirm Delete</h4>
+
+                              </div>
+
+                              <div class="modal-body">
+
+                                 <p>You are about to delete <b><i class="title"></i></b> record, this procedure is irreversible.</p>
+
+                                 <p>Do you want to proceed?</p>
+
+                              </div>
+
+                              <div class="modal-footer">
+
+                                 {!! Form::open(['method' => 'delete','route' => ['gamerstournaments.destroy', $data->gtid],'style'=>'display:inline']) !!}
+
+                                 {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-fill btn-sm']) !!}
+
+                                 <button type="button" class="btn btn-default btn-fill btn-sm" data-dismiss="modal">Cancel</button>
+
+                                 {!! Form::close() !!}
+
+                              </div>
+
+                           </div>
+
+                        </div>
+
+                     </div>
+
+                     @endcan
+
+                  </td>
+
+               </tr>
+
+               <?php $slno = $slno + 1; ?>    
+
+               @endforeach
+
+               @endif
+
+            </tbody>
+
+         </table>
+
+         <div>
+
+         </div>
+
+      </div>
+
+   </div>
+
+</div>
+
+
+
+<!-- Modal -->
+
+<div id="myModal" class="modal fade" role="dialog">
+
+   <div class="modal-dialog">
+
+    <!-- Modal content-->
+
+      <div class="modal-content">
+
+         <div class="modal-header">
+
+           <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+           <h4 class="modal-title">Set Room Password</h4>
+
+         </div>
+
+         <div class="modal-body">
+
+            <form action="{{route('roomSchedule')}}" method="post" accept-charset="utf-8" onSubmit="return gamerSelectLimit();">
+
+            @csrf 
+
+               <div class="row">           
+
+                <div class="col-md-12">
+
+                  <div class="form-group">
+
+                      <label>Select Room : <em>*</em></label> <br>
+
+                      <select name="room_code" id="room_code" class="form-control" autocomplete="off" required="required">
+
+                        <option value="">Select Room</option>
+
+                        @foreach($tournamentrooms as $room)
+
+                        <option value="{{$room->room_code}}">{{$room->room_code}}</option>
+
+                        @endforeach
+
+                     </select>
+
+                      
+
+                    </div>
+
+                  </div>
+
+               </div>
+
+               <div class="row">           
+
+                <div class="col-md-12">
+
+                  <div class="form-group">
+
+                      <label>Password : <em>*</em></label> <br>
+
+                      <input type="text" name="password" id="password" class="form-control" autocomplete="off" required="required">
+
+                      @if($errors->has('password'))
+
+                      <span class="roy-vali-error"><small>{{$errors->first('password')}}</small></span>
+
+                      @endif
+
+                    </div>
+
+                  </div>
+
+               </div>
+
+               <div class="row">           
+
+                <div class="col-md-6">
+
+                  <div class="form-group">
+
+                      <label>Start date : <em>*</em></label> <br>
+
+                      <input type="date" name="start_date" id="start_date" class="form-control" autocomplete="off" required="required">
+
+                      
+
+                    </div>
+
+                  </div>
+
+                  <div class="col-md-6">
+
+                    <div class="form-group">
+
+                      <label>End date : <em>*</em></label> <br>
+
+                      <input type="date" name="end_date" id="end_date" class="form-control" autocomplete="off" required="required">
+
+                      
+
+                    </div>
+
+                  </div>
+
+               </div>
+
+
+
+              <div class="row">           
+
+                <div class="col-md-6">
+
+                  <div class="form-group">
+
+                      <label>Start time : <em>*</em></label> <br>
+
+                      <input type="time" name="start_time" id="start_time" class="form-control" autocomplete="off" required="required">
+
+                      
+
+                    </div>
+
+                  </div>
+
+                  <div class="col-md-6">
+
+                    <div class="form-group">
+
+                      <label>End time : <em>*</em></label> <br>
+
+                      <input type="time" name="end_time" id="end_time" class="form-control" autocomplete="off" required="required">
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+                 <div class="row">           
+
+                      <div class="col-md-6">
+
+                        <div class="form-group">
+
+                            <button type="submit" class="btn bg-teal-400"><i class="fas fa-save mr-1"></i> Save</button>
+
+                        </div>
+
+                     </div>
+
+                  </div>
+
+                  </form>
+
+               </div>
+
+         <div class="modal-footer">
+
+           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+         </div>
+
+      </div>
+
+   </div>
+
+</div>
+
+
+
+<!-- Modal -->
+
+<div id="myModal1" class="modal fade" role="dialog">
+
+   <div class="modal-dialog">
+
+    <!-- Modal content-->
+
+      <div class="modal-content">
+
+         <div class="modal-header">
+             <h4 class="modal-title">Send Email</h4>
+           <button type="button" class="close" data-dismiss="modal">&times;</button>          
+
+         </div>
+
+         <div class="modal-body">
+
+            <form action="{{route('sendMail')}}" method="post" accept-charset="utf-8" onSubmit="return gamerSelectLimit();">
+
+            @csrf 
+
+               <div class="row">           
+
+                <div class="col-md-12">
+
+                  <div class="form-group">
+
+                      <label>Subject : <em>*</em></label> <br>
+
+                      <input type="text" name="subject" id="subject" class="form-control" autocomplete="off" required="required">
+
+                    </div>
+
+                  </div>
+
+               </div>
+             
+               <div class="row">           
+
+                <div class="col-md-12">
+
+                  <div class="form-group">
+
+                      <label>Message : <em>*</em></label> <br>
+
+                      <textarea class="form-control"  name="message" id="message" autocomplete="off" required="required"></textarea>                    
+                    </div>
+                  </div>
+               </div>
+                <script type="text/javascript">
+                  CKEDITOR.replace('message');
+                </script> 
+                 <div class="row">           
+
+                      <div class="col-md-6">
+
+                        <div class="form-group">
+
+                            <button type="submit" class="btn bg-teal-400"><i class="fas fa-save mr-1"></i> Save</button>
+
+                        </div>
+
+                     </div>
+
+                  </div>
+
+                  </form>
+
+               </div>
+
+         <div class="modal-footer">
+
+           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+         </div>
+
+      </div>
+
+   </div>
+
+</div>
+
+<script type="text/javascript">
+  CKEDITOR.replace('message');
+ 
+</script>
+@endsection
+

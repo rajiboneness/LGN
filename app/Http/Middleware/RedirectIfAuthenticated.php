@@ -18,10 +18,26 @@ class RedirectIfAuthenticated
      */
     public function handle($request, Closure $next, $guard = null)
     {
+        switch ($guard) {
+        case 'gamer':
+          if (Auth::guard($guard)->check()) {
+            return redirect()->route('home.index');
+          }
         if (Auth::guard($guard)->check()) {
-            return redirect(RouteServiceProvider::HOME);
-        }
-
-        return $next($request);
+        $roles=(auth()->user()->roles->pluck('name'));
+            foreach ($roles as  $role) {
+                switch ($role) {
+                case 'User':
+              return  redirect()->route('news');   
+         }
+       }
+     }
+        default:
+          if (Auth::guard($guard)->check()) {
+              return redirect('dashboard');
+          }
+          break;
+      }
+      return $next($request);
     }
 }
